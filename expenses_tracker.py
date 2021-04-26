@@ -25,26 +25,26 @@ class Database:
                     category text
                     )""")
 
-            self.c.execute("""
-                INSERT INTO expenses VALUES
-                (NULL, "21-04-18", "Coca-Cola", 160, "soft drink"),
-                (NULL, "21-04-19", "Amazon Prime", 1500, "subscription"),
-                (NULL, "21-04-19", "Dinner", 3200, "dining"),
-                (NULL, "21-04-18", "Sprite", 160, "soft drink"),
-                (NULL, "21-04-18", "Hotto Motto Bento", 660, "bento"),
-                (NULL, "21-04-18", "New Super", 3000, "groceries"),
-                (NULL, "21-04-18", "Starcraft III", 6000, "games"),
-                (NULL, "21-04-18", "Chinese Super", 1100, "groceries"),
-                (NULL, "21-04-18", "Sapporo", 990, "alcohol"),
-                (NULL, "21-04-18", "Tissues", 240, "household"),
-                (NULL, "21-04-18", "Earbuds", 10000, "accessories"),
-                (NULL, "21-04-18", "Boss Coffee", 160, "coffee"),
-                (NULL, "21-04-18", "Sleeping Pills", 3990, "medicine")
-                """)
+            # self.c.execute("""
+            #     INSERT INTO expenses VALUES
+            #     (NULL, "21-04-18", "Coca-Cola", 160, "soft drink"),
+            #     (NULL, "21-04-19", "Amazon Prime", 1500, "subscription"),
+            #     (NULL, "21-04-19", "Dinner", 3200, "dining"),
+            #     (NULL, "21-04-18", "Sprite", 160, "soft drink"),
+            #     (NULL, "21-04-18", "Hotto Motto Bento", 660, "bento"),
+            #     (NULL, "21-04-18", "New Super", 3000, "groceries"),
+            #     (NULL, "21-04-18", "Starcraft III", 6000, "games"),
+            #     (NULL, "21-04-18", "Chinese Super", 1100, "groceries"),
+            #     (NULL, "21-04-18", "Sapporo", 990, "alcohol"),
+            #     (NULL, "21-04-18", "Tissues", 240, "household"),
+            #     (NULL, "21-04-18", "Earbuds", 10000, "accessories"),
+            #     (NULL, "21-04-18", "Boss Coffee", 160, "coffee"),
+            #     (NULL, "21-04-18", "Sleeping Pills", 3990, "medicine")
+            #     """)
 
     def add_expense(self, expense):
         with self.conn:
-            self.c.execute("INSERT INTO expenses VALUES (NULL, :date, :name, :cost, :category", {"date": expense.date, "name": expense.name, "cost": expense.cost, "category": expense.category})
+            self.c.execute("INSERT INTO expenses VALUES (NULL, :date, :name, :cost, :category)", {"date": expense.date, "name": expense.name, "cost": expense.cost, "category": expense.category})
 
     def remove_expense(self, expense):
         with self.conn:
@@ -62,16 +62,20 @@ class Database:
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_food(self):
-        self.c.execute("SELECT * FROM expenses WHERE category='dining' OR category='groceries'")
+        self.c.execute("SELECT * FROM expenses WHERE category='dining' OR category='groceries' OR category='bento'")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_drinks(self):
-        self.c.execute("SELECT * FROM expenses WHERE category='soft drink' OR category='alcohol' OR category='coffee'")
+        self.c.execute("SELECT * FROM expenses WHERE category='soft drink' OR category='alcohol' OR category='coffee' OR category='tea'")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_over(self, upper):
         self.c.execute("SELECT * FROM expenses WHERE cost > :upper", {"upper": upper})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
+
+    def get_category_total(self, category):
+        self.c.execute("SELECT SUM(cost) FROM expenses WHERE category=:category", {"category": category})
+        return self.c.fetchone()[0]
 
     def get_total(self):
         self.c.execute("SELECT SUM(cost) FROM expenses")
@@ -116,15 +120,20 @@ class Application:
         print("'add expense' - Add an expense.")
         print("'remove expense' - Remove an expense.")
         print("'get category' - Get a list of all expenses in a category.")
+        print("'get category total' - Get a total cost of a category's expenses.")
         print("'get food' - Get a list of all food-related expenses.")
         print("'get drinks' - Get a list of all drink-related expenses.")
         print("'get over' - Get a list of all expenses over a certain amount.")
         print("'order by price' - Get a list of all expenses ordered in descending order.")
         print("'get all' - Get a list of all expenses.")
         print("'get total' - Get a total cost.")
+        print("'quit' - Quit program.")
         intent = input()
 
-        if intent == "add expense":
+        if intent == "quit":
+            self.quit_program()
+
+        elif intent == "add expense":
             self.add_expense()
 
         elif intent == "remove expense":
@@ -137,6 +146,12 @@ class Application:
             category_intent = input()
             for expense in self.db.get_category(category_intent):
                 print(expense)
+            self.main_menu()
+
+        elif intent == "get category total":
+            print("Which category would you like to see?")
+            category_intent = input()
+            print(self.db.get_category_total(category_intent))
             self.main_menu()
 
         elif intent == "get food":
@@ -170,9 +185,27 @@ class Application:
             print(self.db.get_total())
             self.main_menu()
 
+    def quit_program(self):
+        self.db.conn.close()
+        quit()
+
+    def add_expense(self):
+        print("What date was this expense?")
+        date_intent = input()
+        print("What's the name of your expense?")
+        name_intent = input()
+        print("What's the cost of your expense?")
+        cost_intent = input()
+        print("What category does this expense belong in?")
+        category_intent = input()
+        expense = Expense(1, date_intent, name_intent, cost_intent, category_intent)
+        self.db.add_expense(expense)
+        print("Expense added.")
+        self.main_menu()
+
 
 def main():
-    db = Database(test=True)
+    db = Database()
     app = Application(db)
     app.start()
 
