@@ -28,7 +28,7 @@ class Application:
         print()
         print("You can return to this page by entering 'main' at any point.")
         print("You can also quit this program at any point by entering 'quit'.")
-        intent = self.input_handler()
+        intent = self.input_handler(acceptable_inputs=("add expense", "remove expense", "update tags", "get tag", "get distinct tags", "get over", "order by price", "get all", "get total"))
 
         if intent == "add expense":
             self.add_expense()
@@ -144,7 +144,7 @@ class Application:
         # Following keyword arguments are accepted:
         # boolean for yes / no inputs
         # integer for integer inputs
-        # acceptable_inputs can be a list or set of valid inputs
+        # acceptable_inputs can be a tuple, list, or set of valid inputs
         if kwargs.get('boolean'):
             print("Enter 'yes' or 'no'.")
         intent = input().lower()
