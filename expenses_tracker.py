@@ -25,69 +25,82 @@ class Application:
         print("'order by price' - Get a list of all expenses ordered in descending order.")
         print("'get all' - Get a list of all expenses.")
         print("'get total' - Get a total cost.")
-        print("'quit' - Quit program.")
-        intent = input()
+        print()
+        print("You can return to this page by entering 'main' at any point.")
+        print("You can also quit this program at any point by entering 'quit'.")
+        intent = self.input_handler()
 
-        if intent == "quit":
-            self.quit_program()
-
-        elif intent == "add expense":
+        if intent == "add expense":
             self.add_expense()
 
         elif intent == "remove expense":
-            print("What expense would you like to remove?")
-            removal_intent = input()
-            self.remove_expense(removal_intent)
+            self.remove_expense()
 
         elif intent == "update tags":
-            print("What expense would you like to update?")
-            id_intent = input()
-            expense = self.db.get_expense(id_intent)
-            print("What tags would you like to set for this expense?")
-            new_tags = input()
-            expense.tags = new_tags
-            self.db.update_tag(expense)
-            self.main_menu()
+            self.update_tags()
 
         elif intent == "get tag":
-            print("Which tag would you like to see?")
             self.get_tags()
 
         elif intent == "get distinct tags":
-            print()
-            for expense in self.db.get_distinct_tags():
-                print(expense)
-            self.main_menu()
+            self.get_distinct_tags()
 
         elif intent == "get over":
-            print("Over how much would you like to see?")
-            amount_intent = input()
-            for expense in self.db.get_over(amount_intent):
-                print(expense)
-            self.main_menu()
+            self.get_over()
 
         elif intent == "order by price":
-            for expense in self.db.order_by_price():
-                print(expense)
-            self.main_menu()
+            self.order_by_price()
 
         elif intent == "get all":
-            for expense in self.db.get_all():
-                print(expense)
-            self.main_menu()
+            self.get_all()
 
         elif intent == "get total":
-            print(self.db.get_total())
-            self.main_menu()
+            self.get_total()
+
+    def quit_program(self):
+        self.db.conn.close()
+        quit()
+
+    def add_expense(self):
+        print("What date was this expense?")
+        date_intent = self.input_handler()
+        print("What's the name of your expense?")
+        name_intent = self.input_handler()
+        print("What's the cost of your expense?")
+        cost_intent = self.input_handler(integer=True)
+        print("What tags does this expense have?")
+        tag_intent = self.input_handler()
+        expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)
+        self.db.add_expense(expense)
+        print("Expense added.")
+        self.main_menu()
+
+    def remove_expense(self):
+        print("What expense would you like to remove?")
+        removal_intent = self.input_handler(integer=True)
+        self.db.remove_expense(removal_intent)
+        print(f"Expense ID {removal_intent} has been successfully removed.")
+        self.main_menu()
+
+    def update_tags(self):
+        print("What expense would you like to update? (Enter an ID)")
+        id_intent = self.input_handler(integer=True)
+        expense = self.db.get_expense(id_intent)
+        print("What tags would you like to set for this expense?")
+        new_tags = self.input_handler()
+        expense.tags = new_tags
+        self.db.update_tag(expense)
+        self.main_menu()
 
     def get_tags(self, holder=None, new_tag=None):
         if holder is None:
             holder = []
         if new_tag is None:
-            new_tag = input()
+            print("Which tag would you like to see?")
+            new_tag = self.input_handler()
         holder.append(new_tag)
         print("Enter other tags you want to see, or press Enter.")
-        other_intent = input()
+        other_intent = self.input_handler()
         if other_intent == "":
             total_cost = 0
             for intent in holder:
@@ -100,26 +113,68 @@ class Application:
         else:
             self.get_tags(holder, new_tag=other_intent)
 
-    def quit_program(self):
-        self.db.conn.close()
-        quit()
-
-    def add_expense(self):
-        print("What date was this expense?")
-        date_intent = input()
-        print("What's the name of your expense?")
-        name_intent = input()
-        print("What's the cost of your expense?")
-        cost_intent = input()
-        print("What tags does this expense have?")
-        tag_intent = input()
-        expense = Expense(1, date_intent, name_intent, cost_intent, tag_intent)
-        self.db.add_expense(expense)
-        print("Expense added.")
+    def get_distinct_tags(self):
+        for expense in self.db.get_distinct_tags():
+            print(expense)
         self.main_menu()
 
-    def remove_expense(self, expense):
-        self.db.remove_expense(expense)
+    def get_over(self):
+        print("Over how much would you like to see?")
+        amount_intent = self.input_handler(integer=True)
+        for expense in self.db.get_over(amount_intent):
+            print(expense)
+        self.main_menu()
+
+    def order_by_price(self):
+        for expense in self.db.order_by_price():
+            print(expense)
+        self.main_menu()
+
+    def get_all(self):
+        for expense in self.db.get_all():
+            print(expense)
+        self.main_menu()
+
+    def get_total(self):
+        print(f"Total expenses are {self.db.get_total()} yen.")
+        self.main_menu()
+
+    def input_handler(self, message="Please enter a valid input.", destination="main menu", **kwargs):
+        # Checks user inputs based on parameters and redirects them if their inputs are not valid.
+        # Following keyword arguments are accepted:
+        # boolean for yes / no inputs
+        # integer for integer inputs
+        # acceptable_inputs can be a list or set of valid inputs
+        if kwargs.get('boolean'):
+            print("Enter 'yes' or 'no'.")
+        intent = input().lower()
+        print()
+
+        if intent == 'main' or intent == 'back':
+            self.main_menu()
+        if intent == 'quit':
+            self.quit_program()
+        if kwargs.get('integer'):
+            try:
+                intent = int(intent)
+            except ValueError:
+                self.redirect(message="Please enter an integer.")
+        if kwargs.get('acceptable_inputs'):
+            acceptable_inputs = kwargs.get('acceptable_inputs')
+            if intent not in acceptable_inputs:
+                self.redirect(message=message)
+        if kwargs.get('boolean'):
+            if intent not in {'yes', 'no'}:
+                self.redirect(message="Please enter 'yes' or 'no'.")
+
+        return intent
+
+    def redirect(self, message="Please enter a valid input."):
+        # Sends users back to the specified destination and sends them an appropriate message.
+        if message:
+            print(message)
+        print(f"Returning to main menu.")
+        print()
         self.main_menu()
 
 
