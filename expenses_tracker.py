@@ -5,6 +5,17 @@ from expense import Expense
 class Application:
     def __init__(self, db):
         self.db = db
+        self.menu = {
+            'add expense': {'func': self.add_expense, 'description': "Add an expense."},
+            'remove expense': {'func': self.remove_expense, 'description': "Remove an expense."},
+            'update tags': {'func': self.update_tags, 'description': "Update an expense's tags."},
+            'get tag': {'func': self.get_tags, 'description': "Get a list of all expenses in a tag."},
+            'get distinct tags': {'func': self.get_distinct_tags, 'description': "Get a list of all current tags."},
+            'get over': {'func': self.get_over, 'description': "Get a list of all expenses over a certain amount."},
+            'order by price': {'func': self.order_by_price, 'description': "Get a list of all expenses ordered in descending order."},
+            'get all': {'func': self.get_all, 'description': "Get a list of all expenses."},
+            'get total': {'func': self.get_total, 'description': "Get a total cost."}
+        }
 
     def start(self):
         print()
@@ -16,46 +27,14 @@ class Application:
 
     def main_menu(self):
         print()
-        print("'add expense' - Add an expense.")
-        print("'remove expense' - Remove an expense.")
-        print("'update tags' - Update an expense's tags.")
-        print("'get tag' - Get a list of all expenses in a tag.")
-        print("'get distinct tags' - Get a list of all current tags.")
-        print("'get over' - Get a list of all expenses over a certain amount.")
-        print("'order by price' - Get a list of all expenses ordered in descending order.")
-        print("'get all' - Get a list of all expenses.")
-        print("'get total' - Get a total cost.")
+        for key in self.menu.keys():
+            print(f"{key} - {self.menu.get(key).get('description')}")
         print()
         print("You can return to this page by entering 'main' at any point.")
         print("You can also quit this program at any point by entering 'quit'.")
-        intent = self.input_handler(acceptable_inputs=("add expense", "remove expense", "update tags", "get tag", "get distinct tags", "get over", "order by price", "get all", "get total"))
+        intent = self.input_handler(acceptable_inputs=self.menu.keys())
 
-        if intent == "add expense":
-            self.add_expense()
-
-        elif intent == "remove expense":
-            self.remove_expense()
-
-        elif intent == "update tags":
-            self.update_tags()
-
-        elif intent == "get tag":
-            self.get_tags()
-
-        elif intent == "get distinct tags":
-            self.get_distinct_tags()
-
-        elif intent == "get over":
-            self.get_over()
-
-        elif intent == "order by price":
-            self.order_by_price()
-
-        elif intent == "get all":
-            self.get_all()
-
-        elif intent == "get total":
-            self.get_total()
+        self.menu.get(intent).get('func')()
 
     def quit_program(self):
         self.db.conn.close()
