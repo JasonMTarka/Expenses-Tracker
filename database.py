@@ -27,23 +27,24 @@ class Database:
                     category text
                     )""")
 
-            self.c.execute("""
-                INSERT INTO expenses VALUES
-                (NULL, "21-04-18", "Coca-Cola", 160, "soft drink"),
-                (NULL, "21-04-19", "Amazon Prime", 1500, "subscription"),
-                (NULL, "21-04-19", "Dinner", 3200, "dining"),
-                (NULL, "21-04-18", "Sprite", 160, "soft drink"),
-                (NULL, "21-04-18", "Hotto Motto Bento", 660, "bento"),
-                (NULL, "21-04-18", "New Super", 3000, "groceries"),
-                (NULL, "21-04-18", "Starcraft III", 6000, "games"),
-                (NULL, "21-04-18", "Chinese Super", 1100, "groceries, jason"),
-                (NULL, "21-04-18", "Sapporo", 990, "alcohol"),
-                (NULL, "21-04-18", "Tissues", 240, "household"),
-                (NULL, "21-04-18", "Earbuds", 10000, "accessories"),
-                (NULL, "21-04-18", "Boss Coffee", 160, "coffee, xiaochen"),
-                (NULL, "21-04-18", "Test", 160, "coffee, okinawa"),
-                (NULL, "21-04-18", "Sleeping Pills", 3990, "medicine, okinawa")
-                """)
+            if self.test is True:
+                self.c.execute("""
+                    INSERT INTO expenses VALUES
+                    (NULL, "21-04-18", "Coca-Cola", 160, "soft drink"),
+                    (NULL, "21-04-19", "Amazon Prime", 1500, "subscription"),
+                    (NULL, "21-04-19", "Dinner", 3200, "dining"),
+                    (NULL, "21-04-18", "Sprite", 160, "soft drink"),
+                    (NULL, "21-04-18", "Hotto Motto Bento", 660, "bento"),
+                    (NULL, "21-04-18", "New Super", 3000, "groceries"),
+                    (NULL, "21-04-18", "Starcraft III", 6000, "games"),
+                    (NULL, "21-04-18", "Chinese Super", 1100, "groceries, jason"),
+                    (NULL, "21-04-18", "Sapporo", 990, "alcohol"),
+                    (NULL, "21-04-18", "Tissues", 240, "household"),
+                    (NULL, "21-04-18", "Earbuds", 10000, "accessories"),
+                    (NULL, "21-04-18", "Boss Coffee", 160, "coffee, xiaochen"),
+                    (NULL, "21-04-18", "Test", 160, "coffee, okinawa"),
+                    (NULL, "21-04-18", "Sleeping Pills", 3990, "medicine, okinawa")
+                    """)
 
     def add_expense(self, expense):
         with self.conn:
