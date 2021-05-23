@@ -1,9 +1,10 @@
 from database import Database
 from expense import Expense
+from typing import Optional
 
 
 class Application:
-    def __init__(self, db):
+    def __init__(self, db: Database):
         self.db = db
         self.menu = {
             'add expense': {'func': self.add_expense, 'description': "Add an expense."},
@@ -71,7 +72,7 @@ class Application:
         self.db.update_tag(expense)
         self.main_menu()
 
-    def get_tags(self, holder=None, new_tag=None):
+    def get_tags(self, holder: Optional[list] = None, new_tag: Optional[str] = None):
         if holder is None:
             holder = []
         if new_tag is None:
@@ -148,7 +149,7 @@ class Application:
 
         return intent
 
-    def redirect(self, message="Please enter a valid input."):
+    def redirect(self, message: str = "Please enter a valid input.") -> None:
         # Sends users back to the specified destination and sends them an appropriate message.
         if message:
             print(message)

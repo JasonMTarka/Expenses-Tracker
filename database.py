@@ -3,7 +3,7 @@ from expense import Expense
 
 
 class Database:
-    def __init__(self, test=False, setup=False):
+    def __init__(self, test: bool = False, setup: bool = False):
 
         self.test = test
         if test is True:
@@ -46,40 +46,40 @@ class Database:
                     (NULL, "21-04-18", "Sleeping Pills", 3990, "medicine, okinawa")
                     """)
 
-    def add_expense(self, expense):
+    def add_expense(self, expense: Expense) -> None:
         with self.conn:
             self.c.execute("INSERT INTO expenses VALUES (NULL, :date, :name, :cost, :tags)", {"date": expense.date, "name": expense.name, "cost": expense.cost, "tags": expense.tags})
 
-    def remove_expense(self, expense):
+    def remove_expense(self, expense: Expense) -> None:
         with self.conn:
             try:
                 self.c.execute("DELETE FROM expenses WHERE id=:key", {'key': expense.key})
             except AttributeError:
                 self.c.execute("DELETE FROM expenses WHERE id=:key", {'key': expense})
 
-    def update_tag(self, expense):
+    def update_tag(self, expense: Expense) -> None:
         with self.conn:
             try:
                 self.c.execute("UPDATE expenses SET category = :tags WHERE id=:key", {'tags': expense.tags, 'key': expense.key})
             except AttributeError:
                 self.c.execute("UPDATE expenses SET category = :tags WHERE id=:key", {'tags': expense.tags, 'key': expense})
 
-    def get_tag(self, tag):
+    def get_tag(self, tag: str) -> list:
         self.c.execute("SELECT * FROM expenses WHERE category LIKE :tag", {"tag": '%' + tag + '%'})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
-    def get_all(self):
+    def get_all(self) -> list:
         self.c.execute("SELECT * FROM expenses")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
-    def get_expense(self, expense):
+    def get_expense(self, expense: Expense) -> Expense:
         try:
             self.c.execute("SELECT * FROM expenses WHERE id = :id", {'id': expense.key})
         except AttributeError:
             self.c.execute("SELECT * FROM expenses WHERE id = :id", {'id': expense})
         return self.convert_to_object(self.c.fetchone())
 
-    def get_distinct_tags(self):
+    def get_distinct_tags(self) -> list:
         self.c.execute("SELECT DISTINCT category FROM expenses")
         temp_list = [expense[0] for expense in self.c.fetchall()]
         result_list = []
@@ -98,18 +98,18 @@ class Database:
                     result_list.append(category)
         return result_list
 
-    def get_over(self, upper):
+    def get_over(self, upper: int) -> list:
         self.c.execute("SELECT * FROM expenses WHERE cost > :upper", {"upper": upper})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
-    def get_total(self):
+    def get_total(self) -> int:
         self.c.execute("SELECT SUM(cost) FROM expenses")
         return self.c.fetchone()[0]
 
-    def order_by_price(self):
+    def order_by_price(self) -> list:
         self.c.execute("SELECT * FROM expenses ORDER BY cost DESC")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
-    def convert_to_object(self, record):
+    def convert_to_object(self, record: list) -> Expense:
         tags = record[4].split(", ")
         return Expense(record[0], record[1], record[2], record[3], tags)

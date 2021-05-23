@@ -1,6 +1,6 @@
 
 class Expense:
-    def __init__(self, primary_key, date, name, cost, tags):
+    def __init__(self, primary_key, date: str, name: str, cost: int, tags: str):
         self.key = primary_key
         self.date = date
         self.name = name
