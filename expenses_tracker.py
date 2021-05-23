@@ -2,7 +2,7 @@ import sys
 
 from database import Database
 from expense import Expense
-from typing import Optional
+from typing import Optional, Any, Union
 
 
 class Application:
@@ -21,8 +21,7 @@ class Application:
         }
 
     def start(self) -> None:
-        print()
-        print("Welcome to your expenses tracker.")
+        print("\nWelcome to your expenses tracker.")
         if self.db.test is True:
             print("DEBUGGING MODE!")
         print("What would you like to do?")
@@ -32,8 +31,7 @@ class Application:
         print()
         for key in self.menu.keys():
             print(f"{key} - {self.menu.get(key).get('description')}")
-        print()
-        print("You can return to this page by entering 'main' at any point.")
+        print("\nYou can return to this page by entering 'main' at any point.")
         print("You can also quit this program at any point by entering 'quit'.")
         intent = self.input_handler(acceptable_inputs=self.menu.keys())
 
@@ -89,8 +87,7 @@ class Application:
                 for expense in self.db.get_tag(intent):
                     total_cost += expense.cost
                     print(expense)
-            print()
-            print(f"The total cost is {total_cost} yen.")
+            print(f"\nThe total cost is {total_cost} yen.")
             self.main_menu()
         else:
             self.get_tags(holder, new_tag=other_intent)
@@ -121,7 +118,7 @@ class Application:
         print(f"Total expenses are {self.db.get_total()} yen.")
         self.main_menu()
 
-    def input_handler(self, message="Please enter a valid input.", destination="main menu", **kwargs):
+    def input_handler(self, message: str = "Please enter a valid input.", destination: str = "main menu", **kwargs: Union[bool, str]) -> Any:
         # Checks user inputs based on parameters and redirects them if their inputs are not valid.
         # Following keyword arguments are accepted:
         # boolean for yes / no inputs
@@ -138,15 +135,15 @@ class Application:
             self.quit_program()
         if kwargs.get('integer'):
             try:
-                intent = int(intent)
+                intent = int(intent)  # type: ignore
             except ValueError:
                 self.redirect(message="Please enter an integer.")
         if kwargs.get('acceptable_inputs'):
             acceptable_inputs = kwargs.get('acceptable_inputs')
-            if intent not in acceptable_inputs:
+            if intent not in acceptable_inputs:  # type: ignore
                 self.redirect(message=message)
         if kwargs.get('boolean'):
-            if intent not in {'yes', 'no'}:
+            if intent not in ('yes', 'no'):
                 self.redirect(message="Please enter 'yes' or 'no'.")
 
         return intent
@@ -155,8 +152,7 @@ class Application:
         # Sends users back to the specified destination and sends them an appropriate message.
         if message:
             print(message)
-        print(f"Returning to main menu.")
-        print()
+        print(f"Returning to main menu.\n")
         self.main_menu()
 
 

@@ -3,7 +3,7 @@ from expense import Expense
 
 
 class Database:
-    def __init__(self, test: bool = False, setup: bool = False):
+    def __init__(self, test: bool = False, setup: bool = False) -> None:
 
         self.test = test
         if test is True:
@@ -16,7 +16,7 @@ class Database:
         if setup is True or test is True:
             self.setup()
 
-    def setup(self):
+    def setup(self) -> None:
         with self.conn:
             self.c.execute("""
                     CREATE TABLE expenses (
