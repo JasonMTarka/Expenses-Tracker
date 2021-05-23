@@ -1,3 +1,5 @@
+import sys
+
 from database import Database
 from expense import Expense
 from typing import Optional
@@ -39,7 +41,7 @@ class Application:
 
     def quit_program(self):
         self.db.conn.close()
-        quit()
+        sys.exit("Closing program...")
 
     def add_expense(self):
         print("What date was this expense?")
