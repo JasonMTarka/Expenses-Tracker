@@ -6,7 +6,7 @@ from typing import Optional
 
 
 class Application:
-    def __init__(self, db: Database):
+    def __init__(self, db: Database) -> None:
         self.db = db
         self.menu = {
             'add expense': {'func': self.add_expense, 'description': "Add an expense."},
@@ -20,7 +20,7 @@ class Application:
             'get total': {'func': self.get_total, 'description': "Get a total cost."}
         }
 
-    def start(self):
+    def start(self) -> None:
         print()
         print("Welcome to your expenses tracker.")
         if self.db.test is True:
@@ -39,11 +39,11 @@ class Application:
 
         self.menu.get(intent).get('func')()
 
-    def quit_program(self):
+    def quit_program(self) -> None:
         self.db.conn.close()
         sys.exit("Closing program...")
 
-    def add_expense(self):
+    def add_expense(self) -> None:
         print("What date was this expense?")
         date_intent = self.input_handler()
         print("What's the name of your expense?")
@@ -57,14 +57,14 @@ class Application:
         print("Expense added.")
         self.main_menu()
 
-    def remove_expense(self):
+    def remove_expense(self) -> None:
         print("What expense would you like to remove?")
         removal_intent = self.input_handler(integer=True)
         self.db.remove_expense(removal_intent)
         print(f"Expense ID {removal_intent} has been successfully removed.")
         self.main_menu()
 
-    def update_tags(self):
+    def update_tags(self) -> None:
         print("What expense would you like to update? (Enter an ID)")
         id_intent = self.input_handler(integer=True)
         expense = self.db.get_expense(id_intent)
@@ -74,7 +74,7 @@ class Application:
         self.db.update_tag(expense)
         self.main_menu()
 
-    def get_tags(self, holder: Optional[list] = None, new_tag: Optional[str] = None):
+    def get_tags(self, holder: Optional[list] = None, new_tag: Optional[str] = None) -> None:
         if holder is None:
             holder = []
         if new_tag is None:
@@ -95,29 +95,29 @@ class Application:
         else:
             self.get_tags(holder, new_tag=other_intent)
 
-    def get_distinct_tags(self):
+    def get_distinct_tags(self) -> None:
         for expense in self.db.get_distinct_tags():
             print(expense)
         self.main_menu()
 
-    def get_over(self):
+    def get_over(self) -> None:
         print("Over how much would you like to see?")
         amount_intent = self.input_handler(integer=True)
         for expense in self.db.get_over(amount_intent):
             print(expense)
         self.main_menu()
 
-    def order_by_price(self):
+    def order_by_price(self) -> None:
         for expense in self.db.order_by_price():
             print(expense)
         self.main_menu()
 
-    def get_all(self):
+    def get_all(self) -> None:
         for expense in self.db.get_all():
             print(expense)
         self.main_menu()
 
-    def get_total(self):
+    def get_total(self) -> None:
         print(f"Total expenses are {self.db.get_total()} yen.")
         self.main_menu()
 
