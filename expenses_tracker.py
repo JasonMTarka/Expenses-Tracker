@@ -158,7 +158,7 @@ class Application:
         self.main_menu()
 
 
-def main():
+def main() -> None:
     db = Database()
     app = Application(db)
     app.start()
