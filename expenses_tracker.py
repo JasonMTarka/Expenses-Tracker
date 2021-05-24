@@ -126,7 +126,7 @@ class Application:
         # acceptable_inputs can be a tuple, list, or set of valid inputs
         if kwargs.get('boolean'):
             print("Enter 'yes' or 'no'.")
-        intent = input().lower()
+        intent: Union[int, str] = input().lower()
         print()
 
         if intent == 'main' or intent == 'back':
@@ -135,7 +135,7 @@ class Application:
             self.quit_program()
         if kwargs.get('integer'):
             try:
-                intent = int(intent)  # type: ignore
+                intent = int(intent)
             except ValueError:
                 self.redirect(message="Please enter an integer.")
         if kwargs.get('acceptable_inputs'):
