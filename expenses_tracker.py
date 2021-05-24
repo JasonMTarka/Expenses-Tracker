@@ -134,11 +134,13 @@ class Application:
         self.main_menu()
 
     def input_handler(self, prompt: Optional[str] = None, error_msg: str = "Please enter a valid input.", destination: str = "main menu", **kwargs: Union[bool, str]) -> Any:
-        # Checks user inputs based on parameters and redirects them if their inputs are not valid.
-        # Following keyword arguments are accepted:
-        # boolean for yes / no inputs
-        # integer for integer inputs
-        # acceptable_inputs can be a tuple, list, or set of valid inputs
+        '''
+        Checks user inputs based on parameters and redirects them if their inputs are not valid.
+        Following keyword arguments are supported:
+        boolean for yes / no inputs
+        integer for integer inputs
+        acceptable_inputs can be a tuple, list, or set of valid inputs
+        '''
         if prompt:
             print(prompt)
         if kwargs.get('boolean'):
@@ -154,21 +156,21 @@ class Application:
             try:
                 intent = int(intent)
             except ValueError:
-                self.redirect(error_msg="Please enter an integer.")
+                self.redirect(message="Please enter an integer.")
         if kwargs.get('acceptable_inputs'):
             acceptable_inputs = kwargs.get('acceptable_inputs')
             if intent not in acceptable_inputs:  # type: ignore
-                self.redirect(error_msg=error_msg)
+                self.redirect(message=error_msg)
         if kwargs.get('boolean'):
             if intent not in ('yes', 'no'):
-                self.redirect(error_msg="Please enter 'yes' or 'no'.")
+                self.redirect(message="Please enter 'yes' or 'no'.")
 
         return intent
 
-    def redirect(self, error_msg: str = "Please enter a valid input.") -> None:
+    def redirect(self, message: str = "Please enter a valid input.") -> None:
         # Sends users back to the specified destination and sends them an appropriate message.
-        if error_msg:
-            print(error_msg)
+        if message:
+            print(message)
         print(f"Returning to main menu.\n")
         self.main_menu()
 
