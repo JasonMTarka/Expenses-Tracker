@@ -174,7 +174,7 @@ class Application:
 
 
 def main() -> None:
-    db = Database(test=True)  # To test, set flag 'test=True'
+    db = Database()  # To test, set flag 'test=True'
     app = Application(db)
     app.start()
 
