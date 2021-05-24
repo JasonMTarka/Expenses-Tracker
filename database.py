@@ -1,4 +1,6 @@
 import sqlite3
+from datetime import date
+
 from expense import Expense
 
 
@@ -30,15 +32,15 @@ class Database:
             if self.test is True:
                 self.c.execute("""
                     INSERT INTO expenses VALUES
-                    (NULL, "21-04-18", "Coca-Cola", 160, "soft drink"),
-                    (NULL, "21-04-19", "Amazon Prime", 1500, "subscription"),
-                    (NULL, "21-04-19", "Dinner", 3200, "dining"),
+                    (NULL, "20-03-18", "Coca-Cola", 160, "soft drink"),
+                    (NULL, "20-03-19", "Amazon Prime", 1500, "subscription"),
+                    (NULL, "21-03-19", "Dinner", 3200, "dining"),
                     (NULL, "21-04-18", "Sprite", 160, "soft drink"),
                     (NULL, "21-04-18", "Hotto Motto Bento", 660, "bento"),
                     (NULL, "21-04-18", "New Super", 3000, "groceries"),
-                    (NULL, "21-04-18", "Starcraft III", 6000, "games"),
-                    (NULL, "21-04-18", "Chinese Super", 1100, "groceries, jason"),
-                    (NULL, "21-04-18", "Sapporo", 990, "alcohol"),
+                    (NULL, "21-05-18", "Starcraft III", 6000, "games"),
+                    (NULL, "21-05-18", "Chinese Super", 1100, "groceries, jason"),
+                    (NULL, "21-05-18", "Sapporo", 990, "alcohol"),
                     (NULL, "21-04-18", "Tissues", 240, "household"),
                     (NULL, "21-04-18", "Earbuds", 10000, "accessories"),
                     (NULL, "21-04-18", "Boss Coffee", 160, "coffee, xiaochen"),
@@ -64,12 +66,27 @@ class Database:
             except AttributeError:
                 self.c.execute("UPDATE expenses SET category = :tags WHERE id=:key", {'tags': expense.tags, 'key': expense})
 
-    def get_tag(self, tag: str) -> list:
+    def order_by_price(self) -> list[Expense]:
+        self.c.execute("SELECT * FROM expenses ORDER BY cost DESC")
+        return [self.convert_to_object(expense) for expense in self.c.fetchall()]
+
+    def get_tag(self, tag: str) -> list[Expense]:
         self.c.execute("SELECT * FROM expenses WHERE category LIKE :tag", {"tag": '%' + tag + '%'})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
-    def get_all(self) -> list:
+    def get_all(self) -> list[Expense]:
         self.c.execute("SELECT * FROM expenses")
+        return [self.convert_to_object(expense) for expense in self.c.fetchall()]
+
+    def get_limit(self, limit: int = 10) -> list[Expense]:
+        self.c.execute("SELECT * FROM expenses ORDER BY id DESC LIMIT :limit", {"limit": limit})
+        return [self.convert_to_object(expense) for expense in self.c.fetchall()]
+
+    def get_month(self, month: str, year: str) -> list[Expense]:
+        if year == "":
+            year = str(date.today())[2:4]
+        search_params = year + '-' + month + '%'
+        self.c.execute("SELECT * FROM expenses WHERE date LIKE :month", {"month": search_params})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_expense(self, expense: Expense) -> Expense:
@@ -79,7 +96,7 @@ class Database:
             self.c.execute("SELECT * FROM expenses WHERE id = :id", {'id': expense})
         return self.convert_to_object(self.c.fetchone())
 
-    def get_distinct_tags(self) -> list:
+    def get_distinct_tags(self) -> list[str]:
         self.c.execute("SELECT DISTINCT category FROM expenses")
         temp_list = [expense[0] for expense in self.c.fetchall()]
         result_list = []
@@ -88,27 +105,23 @@ class Database:
                 holder = category.split(", ")
                 for item in holder:
                     if item in result_list:
-                        pass
+                        continue
                     else:
                         result_list.append(item)
             else:
                 if category in result_list:
-                    pass
+                    continue
                 else:
                     result_list.append(category)
         return result_list
 
-    def get_over(self, upper: int) -> list:
+    def get_over(self, upper: int) -> list[Expense]:
         self.c.execute("SELECT * FROM expenses WHERE cost > :upper", {"upper": upper})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_total(self) -> int:
         self.c.execute("SELECT SUM(cost) FROM expenses")
         return self.c.fetchone()[0]
-
-    def order_by_price(self) -> list:
-        self.c.execute("SELECT * FROM expenses ORDER BY cost DESC")
-        return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def convert_to_object(self, record: list) -> Expense:
         tags = record[4].split(", ")
