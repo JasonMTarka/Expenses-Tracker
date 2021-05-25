@@ -5,6 +5,7 @@ from expense import Expense
 
 
 class Database:
+
     def __init__(self, test: bool = False, setup: bool = False) -> None:
 
         self.test = test

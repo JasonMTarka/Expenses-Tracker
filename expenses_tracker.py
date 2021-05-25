@@ -1,12 +1,13 @@
 import sys
 from datetime import date
+from typing import Optional, Any, Union
 
 from database import Database
 from expense import Expense
-from typing import Optional, Any, Union
 
 
 class Application:
+
     def __init__(self, db: Database) -> None:
         self.db = db
         self.menu = {
@@ -51,7 +52,7 @@ class Application:
         name_intent = self.input_handler(prompt="What's the name of your expense?")
         cost_intent = self.input_handler(prompt="What's the cost of your expense?", integer=True)
         tag_intent = self.input_handler(prompt="What tags does this expense have?")
-        expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)
+        expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)  # id argument will be handled later by database, so 0 is placeholder
         self.db.add_expense(expense)
         print("Expense added.")
         self.main_menu()
@@ -133,7 +134,8 @@ class Application:
         print(f"Total expenses are {self.db.get_total()} yen.")
         self.main_menu()
 
-    def input_handler(self, prompt: Optional[str] = None, error_msg: str = "Please enter a valid input.", destination: str = "main menu", **kwargs: Union[bool, str]) -> Any:
+    def input_handler(self, prompt: Optional[str] = None, error_msg: str = "Please enter a valid input.",
+                      destination: str = "main menu", **kwargs: Union[bool, str]) -> Any:
         '''
         Checks user inputs based on parameters and redirects them if their inputs are not valid.
         Following keyword arguments are supported:
@@ -143,24 +145,30 @@ class Application:
         '''
         if prompt:
             print(prompt)
+
         if kwargs.get('boolean'):
             print("Enter 'yes' or 'no'.")
+
         intent: Union[int, str] = input().lower()
         print()
 
         if intent == 'main' or intent == 'back':
             self.main_menu()
+
         if intent == 'quit':
             self.quit_program()
+
         if kwargs.get('integer'):
             try:
                 intent = int(intent)
             except ValueError:
                 self.redirect(message="Please enter an integer.")
+
         if kwargs.get('acceptable_inputs'):
             acceptable_inputs = kwargs.get('acceptable_inputs')
             if intent not in acceptable_inputs:  # type: ignore
                 self.redirect(message=error_msg)
+
         if kwargs.get('boolean'):
             if intent not in ('yes', 'no'):
                 self.redirect(message="Please enter 'yes' or 'no'.")
