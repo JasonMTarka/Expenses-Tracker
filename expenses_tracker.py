@@ -25,9 +25,9 @@ class Application:
         }
 
     def start(self) -> None:
-        print("\nWelcome to your expenses tracker.")
         if self.db.test is True:
             print("DEBUGGING MODE!")
+        print("\nWelcome to your expenses tracker.")
         print("What would you like to do?")
         self.main_menu()
 
@@ -126,7 +126,7 @@ class Application:
         self.main_menu()
 
     def print_ten(self) -> None:
-        for expense in self.db.get_limit():
+        for expense in self.db.get_limit()[::-1]:
             print(expense)
         self.main_menu()
 
@@ -184,7 +184,13 @@ class Application:
 
 
 def main() -> None:
-    db = Database()  # To test, set flag 'test=True'
+
+    test = False
+    for cl_arg in sys.argv[1:]:
+        if cl_arg == "test":
+            test = True
+
+    db = Database(test=test)
     app = Application(db)
     app.start()
 
