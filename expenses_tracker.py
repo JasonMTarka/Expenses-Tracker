@@ -46,8 +46,8 @@ class Application:
         sys.exit("Closing program...")
 
     def add_expense(self) -> None:
-        date_intent = self.input_handler(prompt="What date was this expense? Enter like '21-04-31'.  If today, enter 'today'.")
-        if date_intent == "today":
+        date_intent = self.input_handler(prompt="What date was this expense? Enter like '21-04-31'.  If today, press Enter.")
+        if date_intent == "":
             date_intent = str(date.today())[2:]
         name_intent = self.input_handler(prompt="What's the name of your expense?")
         cost_intent = self.input_handler(prompt="What's the cost of your expense?", integer=True)
