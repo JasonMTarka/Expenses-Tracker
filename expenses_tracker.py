@@ -139,7 +139,7 @@ class Application:
         '''
         Checks user inputs based on parameters and redirects them if their inputs are not valid.
         Following keyword arguments are supported:
-        'lowercase = False' for allowing capital letters
+        'allow_uppercase = True' for allowing capital letters
         boolean for yes / no inputs
         integer for integer inputs
         acceptable_inputs can be a tuple, list, or set of valid inputs
