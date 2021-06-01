@@ -49,7 +49,7 @@ class Application:
         date_intent = self.input_handler(prompt="What date was this expense? Enter like '21-04-31'.  If today, press Enter.")
         if date_intent == "":
             date_intent = str(date.today())[2:]
-        name_intent = self.input_handler(prompt="What's the name of your expense?")
+        name_intent = self.input_handler(prompt="What's the name of your expense?", lowercase=False)
         cost_intent = self.input_handler(prompt="What's the cost of your expense?", integer=True)
         tag_intent = self.input_handler(prompt="What tags does this expense have?")
         expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)  # id argument will be handled later by database, so 0 is placeholder
@@ -139,6 +139,7 @@ class Application:
         '''
         Checks user inputs based on parameters and redirects them if their inputs are not valid.
         Following keyword arguments are supported:
+        'lowercase = False' for allowing capital letters
         boolean for yes / no inputs
         integer for integer inputs
         acceptable_inputs can be a tuple, list, or set of valid inputs
@@ -149,7 +150,10 @@ class Application:
         if kwargs.get('boolean'):
             print("Enter 'yes' or 'no'.")
 
-        intent: Union[int, str] = input().lower()
+        if kwargs.get("lowercase") is False:
+            intent: Union[int, str] = input()
+        else:
+            intent = input().lower()
         print()
 
         if intent == 'main' or intent == 'back':
