@@ -49,7 +49,7 @@ class Application:
         date_intent = self.input_handler(prompt="What date was this expense? Enter like '21-04-31'.  If today, press Enter.")
         if date_intent == "":
             date_intent = str(date.today())[2:]
-        name_intent = self.input_handler(prompt="What's the name of your expense?", lowercase=False)
+        name_intent = self.input_handler(prompt="What's the name of your expense?", allow_uppercase=True)
         cost_intent = self.input_handler(prompt="What's the cost of your expense?", integer=True)
         tag_intent = self.input_handler(prompt="What tags does this expense have?")
         expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)  # id argument will be handled later by database, so 0 is placeholder
@@ -150,7 +150,7 @@ class Application:
         if kwargs.get('boolean'):
             print("Enter 'yes' or 'no'.")
 
-        if kwargs.get("lowercase") is False:
+        if kwargs.get("allow_uppercase"):
             intent: Union[int, str] = input()
         else:
             intent = input().lower()
