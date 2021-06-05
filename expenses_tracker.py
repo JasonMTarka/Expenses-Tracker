@@ -37,7 +37,8 @@ class Application:
             print(f"{key} - {self.menu.get(key).get('description')}")
         print("\nYou can return to this page by entering 'main' at any point.")
         print("You can also quit this program at any point by entering 'quit'.")
-        intent = self.input_handler(acceptable_inputs=self.menu.keys())
+        acceptable_inputs = set(self.menu.keys())
+        intent = self.input_handler(acceptable_inputs=acceptable_inputs)
 
         self.menu.get(intent).get('func')()
 
@@ -142,7 +143,7 @@ class Application:
         'allow_uppercase = True' for allowing capital letters
         boolean for yes / no inputs
         integer for integer inputs
-        acceptable_inputs can be a tuple, list, or set of valid inputs
+        acceptable_inputs can be a tuple, list, or set (preferred b/c hashing) of valid inputs
         '''
         if prompt:
             print(prompt)
