@@ -25,7 +25,7 @@ class Application:
         }
 
     def start(self) -> None:
-        if self.db.test is True:
+        if self.db.debug is True:
             print("DEBUGGING MODE!")
         print("\nWelcome to your expenses tracker.")
         print("What would you like to do?")
@@ -190,12 +190,12 @@ class Application:
 
 def main() -> None:
 
-    test = False
+    debug = False
     for cl_arg in sys.argv[1:]:
-        if cl_arg == "test":
-            test = True
+        if cl_arg == "--debug" or cl_arg == "-d":
+            debug = True
 
-    db = Database(test=test)
+    db = Database(debug=debug)
     app = Application(db)
     app.start()
 

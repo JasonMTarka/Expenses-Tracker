@@ -6,17 +6,17 @@ from expense import Expense
 
 class Database:
 
-    def __init__(self, test: bool = False, setup: bool = False) -> None:
+    def __init__(self, debug: bool = False, setup: bool = False) -> None:
 
-        self.test = test
-        if test is True:
+        self.debug = debug
+        if debug is True:
             self.conn = sqlite3.connect(":memory:")
         else:
             self.conn = sqlite3.connect("expenses.db")
 
         self.c = self.conn.cursor()
 
-        if setup is True or test is True:
+        if setup is True or debug is True:
             self.setup()
 
     def setup(self) -> None:
@@ -30,7 +30,7 @@ class Database:
                     category text
                     )""")
 
-            if self.test is True:
+            if self.debug is True:
                 self.c.execute("""
                     INSERT INTO expenses VALUES
                     (NULL, "20-03-18", "Coca-Cola", 160, "soft drink"),
