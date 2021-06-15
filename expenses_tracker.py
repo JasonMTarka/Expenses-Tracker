@@ -190,10 +190,33 @@ class Application:
 
 def main() -> None:
 
-    debug = False
-    for cl_arg in sys.argv[1:]:
-        if cl_arg == "--debug" or cl_arg == "-d":
-            debug = True
+    def cmd_line_arg_handler() -> dict:
+
+        opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
+
+        cmd_line_args = {"debug": False}
+
+        if opts:
+
+            if "-h" in opts or "--help" in opts:
+                print("Expenses Tracker by Jason Tarka")
+                print("Accepted command line arguments:")
+                print('"-v" or "--version": Display version information')
+                print('"-d" or "--debug": Enter debugging mode')
+                sys.exit()
+
+            if "-v" in opts or "--version" in opts:
+                print("Application version: 1.1.0")
+                print(f"Python version: {sys.version}")
+                sys.exit()
+
+            if "-d" in opts or "--debug" in opts:
+                cmd_line_args["debug"] = True
+
+        return cmd_line_args
+
+    debug = cmd_line_arg_handler().get("debug")
+    assert type(debug) is bool
 
     db = Database(debug=debug)
     app = Application(db)
