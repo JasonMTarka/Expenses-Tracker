@@ -1,6 +1,6 @@
 import sys
 from datetime import date
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, TYPE_CHECKING
 
 from database import Database
 from expense import Expense
@@ -216,7 +216,8 @@ def main() -> None:
         return cmd_line_args
 
     debug = cmd_line_arg_handler().get("debug")
-    assert type(debug) is bool
+    if TYPE_CHECKING:
+        assert type(debug) is bool
 
     db = Database(debug=debug)
     app = Application(db)
