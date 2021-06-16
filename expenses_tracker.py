@@ -1,6 +1,6 @@
 import sys
 from datetime import date
-from typing import Optional, Any, Union, TYPE_CHECKING
+from typing import Optional, Any, Union
 
 from database import Database
 from expense import Expense
@@ -135,8 +135,8 @@ class Application:
         print(f"Total expenses are {self.db.get_total()} yen.")
         self.main_menu()
 
-    def input_handler(self, prompt: Optional[str] = None, error_msg: str = "Please enter a valid input.",
-                      destination: str = "main menu", **kwargs: Union[bool, str]) -> Any:
+    def input_handler(self, prompt: str = "", error_msg: str = "Please enter a valid input.",
+                      destination: str = "main menu", **kwargs) -> Any:
         '''
         Checks user inputs based on parameters and redirects them if their inputs are not valid.
         Following keyword arguments are supported:
@@ -170,8 +170,8 @@ class Application:
                 self.redirect(message="Please enter an integer.")
 
         if kwargs.get('acceptable_inputs'):
-            acceptable_inputs = kwargs.get('acceptable_inputs')
-            if intent not in acceptable_inputs:  # type: ignore
+            acceptable_inputs = kwargs.get('acceptable_inputs', set())
+            if intent not in acceptable_inputs:
                 self.redirect(message=error_msg)
 
         if kwargs.get('boolean'):
@@ -215,9 +215,7 @@ def main() -> None:
 
         return cmd_line_args
 
-    debug = cmd_line_arg_handler().get("debug")
-    if TYPE_CHECKING:
-        assert type(debug) is bool
+    debug = cmd_line_arg_handler().get("debug", False)
 
     db = Database(debug=debug)
     app = Application(db)
