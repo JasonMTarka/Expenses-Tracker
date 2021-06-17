@@ -8,7 +8,7 @@ class Expense:
         self.tags = tags
 
     def __repr__(self) -> str:
-        return f"Expense({self.key}, {self.date}, {self.name}, {self.cost}, {self.tags}"
+        return f"Expense({self.key}, {self.date}, {self.name}, {self.cost}, {self.tags})"
 
     def __str__(self) -> str:
         return f"""

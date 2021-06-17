@@ -7,6 +7,7 @@ from expense import Expense
 class Database:
 
     def __init__(self, debug: bool = False, setup: bool = False) -> None:
+        """Establish database connection and create cursor."""
 
         self.debug = debug
         if debug is True:
@@ -20,6 +21,8 @@ class Database:
             self.setup()
 
     def setup(self) -> None:
+        """Handle first-time setup or debugging mode setup."""
+
         with self.conn:
             self.c.execute("""
                     CREATE TABLE expenses (
@@ -50,10 +53,14 @@ class Database:
                     """)
 
     def add_expense(self, expense: Expense) -> None:
+        """Add an expense to the database."""
+
         with self.conn:
             self.c.execute("INSERT INTO expenses VALUES (NULL, :date, :name, :cost, :tags)", {"date": expense.date, "name": expense.name, "cost": expense.cost, "tags": expense.tags})
 
     def remove_expense(self, expense: Expense) -> None:
+        """Remove an expense from the database."""
+
         with self.conn:
             try:
                 self.c.execute("DELETE FROM expenses WHERE id=:key", {'key': expense.key})
@@ -61,6 +68,8 @@ class Database:
                 self.c.execute("DELETE FROM expenses WHERE id=:key", {'key': expense})
 
     def update_tag(self, expense: Expense) -> None:
+        """Update tag of a given expense."""
+
         with self.conn:
             try:
                 self.c.execute("UPDATE expenses SET category = :tags WHERE id=:key", {'tags': expense.tags, 'key': expense.key})
@@ -68,22 +77,32 @@ class Database:
                 self.c.execute("UPDATE expenses SET category = :tags WHERE id=:key", {'tags': expense.tags, 'key': expense})
 
     def order_by_price(self) -> list[Expense]:
+        """Query database for a list of expenses ordered by cost."""
+
         self.c.execute("SELECT * FROM expenses ORDER BY cost DESC")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_tag(self, tag: str) -> list[Expense]:
+        """Query database for a list of expenses with given tags."""
+
         self.c.execute("SELECT * FROM expenses WHERE category LIKE :tag", {"tag": '%' + tag + '%'})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_all(self) -> list[Expense]:
+        """Query database for a list of all expenses."""
+
         self.c.execute("SELECT * FROM expenses")
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_limit(self, limit: int = 10) -> list[Expense]:
+        """Query for a list of expenses limited to 'limit' number of expenses."""
+
         self.c.execute("SELECT * FROM expenses ORDER BY id DESC LIMIT :limit", {"limit": limit})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_month(self, month: str, year: str) -> list[Expense]:
+        """Query database for expenses on a given month."""
+
         if year == "":
             year = str(date.today())[2:4]
         search_params = year + '-' + month + '%'
@@ -91,6 +110,8 @@ class Database:
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_expense(self, expense: Expense) -> Expense:
+        """Query database for a specific expense."""
+
         try:
             self.c.execute("SELECT * FROM expenses WHERE id = :id", {'id': expense.key})
         except AttributeError:
@@ -98,6 +119,8 @@ class Database:
         return self.convert_to_object(self.c.fetchone())
 
     def get_distinct_tags(self) -> list[str]:
+        """Display all unique tags in table."""
+
         self.c.execute("SELECT DISTINCT category FROM expenses")
         temp_list = [expense[0] for expense in self.c.fetchall()]
         result_list = []
@@ -117,13 +140,19 @@ class Database:
         return result_list
 
     def get_over(self, upper: int) -> list[Expense]:
+        """Get all expenses over a specified amount."""
+
         self.c.execute("SELECT * FROM expenses WHERE cost > :upper", {"upper": upper})
         return [self.convert_to_object(expense) for expense in self.c.fetchall()]
 
     def get_total(self) -> int:
+        """Query database for sum total of expenses."""
+
         self.c.execute("SELECT SUM(cost) FROM expenses")
         return self.c.fetchone()[0]
 
     def convert_to_object(self, record: list) -> Expense:
+        """Converts database record into an Expense object."""
+
         tags = record[4].split(", ")
         return Expense(record[0], record[1], record[2], record[3], tags)
