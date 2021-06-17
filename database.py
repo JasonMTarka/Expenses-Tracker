@@ -5,6 +5,7 @@ from expense import Expense
 
 
 class Database:
+    """Database object for reading from and writing to database file."""
 
     def __init__(self, debug: bool = False, setup: bool = False) -> None:
         """Establish database connection and create cursor."""
