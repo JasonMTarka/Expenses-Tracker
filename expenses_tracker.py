@@ -109,7 +109,7 @@ class Application:
         """Create an updated Expense object and add it to the database."""
 
         date_intent = self.input_handler(
-            prompt="What date was this expense? Enter like '21-04-31'."
+            prompt="What date was this expense? Enter like '21-04-31'.\n"
             "If today, press Enter.")
 
         if date_intent == "":
