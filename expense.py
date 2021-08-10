@@ -36,4 +36,4 @@ class Expense:
             f"Date: {self.date}, "
             f"Name: {self.name}, "
             f"Cost: {self.cost}, "
-            f"Tags: {', '.join(self.tags)}")
+            f"Tags: {self.tags}")

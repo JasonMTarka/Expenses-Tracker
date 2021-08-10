@@ -1,9 +1,15 @@
 import sys
+from enum import Enum
 from datetime import date
 from typing import Optional, Any, Union
 
 from database import Database
 from expense import Expense
+
+
+class Labels(Enum):
+    FUNC = "function"
+    DESC = "description"
 
 
 class Application:
@@ -15,61 +21,56 @@ class Application:
         self.db = db
         self.menu = {
             'add expense':
-                {'func':
+                {Labels.FUNC:
                     self.add_expense,
-                 'description':
+                 Labels.DESC:
                     "Add an expense."},
             'remove expense':
-                {'func':
+                {Labels.FUNC:
                     self.remove_expense,
-                 'description':
+                 Labels.DESC:
                     "Remove an expense."},
             'update tags':
-                {'func':
+                {Labels.FUNC:
                     self.update_tags,
-                 'description':
+                 Labels.DESC:
                     "Update an expense's tags."},
             'order by price':
-                {'func':
+                {Labels.FUNC:
                     self.order_by_price,
-                 'description':
+                 Labels.DESC:
                     "Get a list of all expenses "
                     "ordered in descending order."},
             'get tag':
-                {'func':
+                {Labels.FUNC:
                     self.print_tags,
-                 'description':
+                 Labels.DESC:
                     "Get a list of all expenses in a tag."},
             'get distinct tags':
-                {'func':
+                {Labels.FUNC:
                     self.print_distinct_tags,
-                 'description':
+                 Labels.DESC:
                     "Get a list of all current tags."},
             'get over':
-                {'func':
+                {Labels.FUNC:
                     self.print_over,
-                 'description':
+                 Labels.DESC:
                     "Get a list of all expenses over a certain amount."},
             'get all':
-                {'func':
+                {Labels.FUNC:
                     self.print_all,
-                 'description':
+                 Labels.DESC:
                     "Get a list of all expenses."},
             'get month':
-                {'func':
+                {Labels.FUNC:
                     self.print_month,
-                 'description':
+                 Labels.DESC:
                     "Get a month's expenses."},
             'get total':
-                {'func':
+                {Labels.FUNC:
                     self.print_total,
-                 'description':
-                    "Get a total cost."},
-            'get ten':
-                {'func':
-                    self.print_ten,
-                 'description':
-                    "Get the ten most recent entries."}
+                 Labels.DESC:
+                    "Get a total cost."}
         }
 
     def start(self) -> None:
@@ -84,10 +85,10 @@ class Application:
 
     def main_menu(self):
         """Display main menu options."""
-
+        self.print_ten()
         print()
         for key in self.menu.keys():
-            print(f"{key} - {self.menu.get(key).get('description')}")
+            print(f"{key} - {self.menu.get(key).get(Labels.DESC)}")
         print(
             "\nYou can return to this page by entering 'main' at any point.\n"
             "You can also quit this program at any point by entering 'quit'.")
@@ -97,7 +98,7 @@ class Application:
         intent = self.input_handler(
             acceptable_inputs=acceptable_inputs)
 
-        self.menu.get(intent).get('func')()
+        self.menu.get(intent).get(Labels.FUNC)()
 
     def quit_program(self) -> None:
         """Close database connection and exit program."""
@@ -107,6 +108,9 @@ class Application:
 
     def add_expense(self) -> None:
         """Create an updated Expense object and add it to the database."""
+
+        TAX = 1.1
+        alcohol_expense = None
 
         date_intent = self.input_handler(
             prompt="What date was this expense? Enter like '21-04-31'.\n"
@@ -124,13 +128,35 @@ class Application:
         tag_intent = self.input_handler(
             prompt="What tags does this expense have?")
 
+        if "groceries" in tag_intent:
+            alcohol_check = self.input_handler(
+                prompt="Did you buy any alcohol?",
+                boolean=True)
+
+            if alcohol_check == "yes":
+                alcohol_cost = self.input_handler(
+                    prompt="How much did you spend on alcohol?",
+                    integer=True)
+
+                taxed_alcohol = alcohol_cost * TAX
+
+                cost_intent -= taxed_alcohol
+                alcohol_expense = Expense(0,
+                                          date_intent,
+                                          name_intent,
+                                          taxed_alcohol,
+                                          "alcohol")
+            else:
+                pass
+
         expense = Expense(0,
                           date_intent,
                           name_intent,
                           cost_intent,
                           tag_intent)
         # Id argument will be handled later by database, so 0 is placeholder
-
+        if alcohol_expense:
+            self.db.add_expense(alcohol_expense)
         self.db.add_expense(expense)
         print("Expense added.")
         self.main_menu()
@@ -250,7 +276,6 @@ class Application:
 
         for expense in self.db.get_limit()[::-1]:
             print(expense)
-        self.main_menu()
 
     def print_total(self) -> None:
         """Print total cost of all expenses."""
