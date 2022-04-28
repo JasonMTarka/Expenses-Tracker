@@ -1,13 +1,12 @@
 import sys
-from enum import Enum
 from datetime import date
-from typing import Optional, Any, Union
+from typing import Optional, Any
 
-from database import Database
-from expense import Expense
+from repository.database import Database
+from entities.expense import Expense
 
 
-class Labels(Enum):
+class Labels:
     FUNC = "function"
     DESC = "description"
 
@@ -20,57 +19,47 @@ class Application:
 
         self.db = db
         self.menu = {
-            'add expense':
-                {Labels.FUNC:
-                    self.add_expense,
-                 Labels.DESC:
-                    "Add an expense."},
-            'remove expense':
-                {Labels.FUNC:
-                    self.remove_expense,
-                 Labels.DESC:
-                    "Remove an expense."},
-            'update tags':
-                {Labels.FUNC:
-                    self.update_tags,
-                 Labels.DESC:
-                    "Update an expense's tags."},
-            'order by price':
-                {Labels.FUNC:
-                    self.order_by_price,
-                 Labels.DESC:
-                    "Get a list of all expenses "
-                    "ordered in descending order."},
-            'get tag':
-                {Labels.FUNC:
-                    self.print_tags,
-                 Labels.DESC:
-                    "Get a list of all expenses in a tag."},
-            'get distinct tags':
-                {Labels.FUNC:
-                    self.print_distinct_tags,
-                 Labels.DESC:
-                    "Get a list of all current tags."},
-            'get over':
-                {Labels.FUNC:
-                    self.print_over,
-                 Labels.DESC:
-                    "Get a list of all expenses over a certain amount."},
-            'get all':
-                {Labels.FUNC:
-                    self.print_all,
-                 Labels.DESC:
-                    "Get a list of all expenses."},
-            'get month':
-                {Labels.FUNC:
-                    self.print_month,
-                 Labels.DESC:
-                    "Get a month's expenses."},
-            'get total':
-                {Labels.FUNC:
-                    self.print_total,
-                 Labels.DESC:
-                    "Get a total cost."}
+            "add expense": {
+                Labels.FUNC: self.add_expense,
+                Labels.DESC: "Add an expense.",
+            },
+            "remove expense": {
+                Labels.FUNC: self.remove_expense,
+                Labels.DESC: "Remove an expense.",
+            },
+            "update tags": {
+                Labels.FUNC: self.update_tags,
+                Labels.DESC: "Update an expense's tags.",
+            },
+            "order by price": {
+                Labels.FUNC: self.order_by_price,
+                Labels.DESC: "Get a list of all expenses "
+                "ordered in descending order.",
+            },
+            "get tag": {
+                Labels.FUNC: self.print_tags,
+                Labels.DESC: "Get a list of all expenses in a tag.",
+            },
+            "get distinct tags": {
+                Labels.FUNC: self.print_distinct_tags,
+                Labels.DESC: "Get a list of all current tags.",
+            },
+            "get over": {
+                Labels.FUNC: self.print_over,
+                Labels.DESC: "Get a list of all expenses over a certain amount.",
+            },
+            "get all": {
+                Labels.FUNC: self.print_all,
+                Labels.DESC: "Get a list of all expenses.",
+            },
+            "get month": {
+                Labels.FUNC: self.print_month,
+                Labels.DESC: "Get a month's expenses.",
+            },
+            "get total": {
+                Labels.FUNC: self.print_total,
+                Labels.DESC: "Get a total cost.",
+            },
         }
 
     def start(self) -> None:
@@ -78,9 +67,7 @@ class Application:
 
         if self.db.debug is True:
             print("DEBUGGING MODE!")
-        print(
-            "\nWelcome to your expenses tracker.\n"
-            "What would you like to do?")
+        print("\nWelcome to your expenses tracker.\n" "What would you like to do?")
         self.main_menu()
 
     def main_menu(self):
@@ -91,12 +78,12 @@ class Application:
             print(f"{key} - {self.menu.get(key).get(Labels.DESC)}")
         print(
             "\nYou can return to this page by entering 'main' at any point.\n"
-            "You can also quit this program at any point by entering 'quit'.")
+            "You can also quit this program at any point by entering 'quit'."
+        )
 
         acceptable_inputs = set(self.menu.keys())
 
-        intent = self.input_handler(
-            acceptable_inputs=acceptable_inputs)
+        intent = self.input_handler(acceptable_inputs=acceptable_inputs)
 
         self.menu.get(intent).get(Labels.FUNC)()
 
@@ -114,46 +101,40 @@ class Application:
 
         date_intent = self.input_handler(
             prompt="What date was this expense? Enter like '21-04-31'.\n"
-            "If today, press Enter.")
+            "If today, press Enter."
+        )
 
         if date_intent == "":
             date_intent = str(date.today())[2:]
 
         name_intent = self.input_handler(
-            prompt="What's the name of your expense?",
-            allow_uppercase=True)
+            prompt="What's the name of your expense?", allow_uppercase=True
+        )
         cost_intent = self.input_handler(
-            prompt="What's the cost of your expense?",
-            integer=True)
-        tag_intent = self.input_handler(
-            prompt="What tags does this expense have?")
+            prompt="What's the cost of your expense?", integer=True
+        )
+        tag_intent = self.input_handler(prompt="What tags does this expense have?")
 
         if "groceries" in tag_intent:
             alcohol_check = self.input_handler(
-                prompt="Did you buy any alcohol?",
-                boolean=True)
+                prompt="Did you buy any alcohol?", boolean=True
+            )
 
             if alcohol_check == "yes":
                 alcohol_cost = self.input_handler(
-                    prompt="How much did you spend on alcohol?",
-                    integer=True)
+                    prompt="How much did you spend on alcohol?", integer=True
+                )
 
-                taxed_alcohol = alcohol_cost * TAX
+                taxed_alcohol = round(alcohol_cost * TAX)
 
-                cost_intent -= taxed_alcohol
-                alcohol_expense = Expense(0,
-                                          date_intent,
-                                          name_intent,
-                                          taxed_alcohol,
-                                          "alcohol")
+                cost_intent -= round(taxed_alcohol)
+                alcohol_expense = Expense(
+                    0, date_intent, name_intent, taxed_alcohol, "alcohol"
+                )
             else:
                 pass
 
-        expense = Expense(0,
-                          date_intent,
-                          name_intent,
-                          cost_intent,
-                          tag_intent)
+        expense = Expense(0, date_intent, name_intent, cost_intent, tag_intent)
         # Id argument will be handled later by database, so 0 is placeholder
         if alcohol_expense:
             self.db.add_expense(alcohol_expense)
@@ -165,8 +146,8 @@ class Application:
         """Remove an expense from the database."""
 
         removal_intent = self.input_handler(
-            prompt="What expense would you like to remove?",
-            integer=True)
+            prompt="What expense would you like to remove?", integer=True
+        )
 
         self.db.remove_expense(removal_intent)
         print(f"Expense ID {removal_intent} has been successfully removed.")
@@ -177,12 +158,14 @@ class Application:
 
         id_intent = self.input_handler(
             prompt="What expense would you like to update? (Enter an ID)",
-            integer=True)
+            integer=True
+        )
 
         expense = self.db.get_expense(id_intent)
 
         new_tags = self.input_handler(
-            prompt="What tags would you like to set for this expense?")
+            prompt="What tags would you like to set for this expense?"
+        )
 
         expense.tags = new_tags
         self.db.update_tag(expense)
@@ -199,12 +182,13 @@ class Application:
         """Display expenses for a month determined by user input."""
 
         month = self.input_handler(
-            prompt="What month would you like to see?\n"
-            "Enter like '04' for April.")
+            prompt="What month would you like to see?\n" "Enter like '04' for April."
+        )
 
         year = self.input_handler(
             prompt=f"Press Enter for {str(date.today())[:4]},"
-            " or for a different year, enter like '19' for 2019.")
+            " or for a different year, enter like '19' for 2019."
+        )
 
         total_cost = 0
         for expense in self.db.get_month(month, year):
@@ -227,13 +211,13 @@ class Application:
         if new_tag is None:
             for tag in self.db.get_distinct_tags():
                 print(tag)
-            new_tag = self.input_handler(
-                prompt="\nWhich tag would you like to see?")
+            new_tag = self.input_handler(prompt="\nWhich tag would you like to see?")
 
         tag_holder.append(new_tag)
 
         intent = self.input_handler(
-            prompt="Enter other tags you want to see, or press Enter.")
+            prompt="Enter other tags you want to see, or press Enter."
+        )
 
         if intent == "":
             total_cost = 0
@@ -257,8 +241,8 @@ class Application:
         """Print all expenses over an amount specified by the user."""
 
         amount_intent = self.input_handler(
-            prompt="Over how much would you like to see?",
-            integer=True)
+            prompt="Over how much would you like to see?", integer=True
+        )
 
         for expense in self.db.get_over(amount_intent):
             print(expense)
@@ -283,50 +267,52 @@ class Application:
         print(f"Total expenses are {self.db.get_total()} yen.")
         self.main_menu()
 
-    def input_handler(self,
-                      prompt: str = "",
-                      error_msg: str = "Please enter a valid input.",
-                      destination: str = "main menu",
-                      **kwargs) -> Any:
-        '''Checks inputs based on parameters and redirects if invalid input.
+    def input_handler(
+        self,
+        prompt: str = "",
+        error_msg: str = "Please enter a valid input.",
+        destination: str = "main menu",
+        **kwargs,
+    ) -> Any:
+        """Checks inputs based on parameters and redirects if invalid input.
         Following keyword arguments are supported:
         'allow_uppercase = True' for allowing capital letters
         boolean for yes / no inputs
         integer for integer inputs
         acceptable_inputs can be a tuple, list, or set of valid inputs
-        '''
+        """
 
         if prompt:
             print(prompt)
 
-        if kwargs.get('boolean'):
+        if kwargs.get("boolean"):
             print("Enter 'yes' or 'no'.")
 
         if kwargs.get("allow_uppercase"):
-            intent: Union[int, str] = input()
+            intent: int | str = input()
         else:
             intent = input().lower()
         print()
 
-        if intent == 'main' or intent == 'back':
-            self.main_menu()
+        match intent:
+            case "main" | "back":
+                self.main_menu()
+            case "quit":
+                self.quit_program()
 
-        if intent == 'quit':
-            self.quit_program()
-
-        if kwargs.get('integer'):
+        if kwargs.get("integer"):
             try:
                 intent = int(intent)
             except ValueError:
                 self.redirect(message="Please enter an integer.")
 
-        if kwargs.get('acceptable_inputs'):
-            acceptable_inputs = kwargs.get('acceptable_inputs', set())
+        if kwargs.get("acceptable_inputs"):
+            acceptable_inputs = kwargs.get("acceptable_inputs", set())
             if intent not in acceptable_inputs:
                 self.redirect(message=error_msg)
 
-        if kwargs.get('boolean'):
-            if intent not in ('yes', 'no'):
+        if kwargs.get("boolean"):
+            if intent not in ("yes", "no"):
                 self.redirect(message="Please enter 'yes' or 'no'.")
 
         return intent
@@ -340,32 +326,28 @@ class Application:
 
 
 def main() -> None:
-
     def cmd_line_arg_handler() -> dict:
 
-        PYTHON_VERSION = "Python version: 3.9.2"
-
+        PYTHON_VERSION = "Python version: 3.10"
         opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
-
         cmd_line_args = {"debug": False}
 
-        if opts:
-
-            if "-h" in opts or "--help" in opts:
+        for opt in opts:
+            if opt == "-h" or opt == "--help":
                 print(
-                    "Expenses Tracker by Jason Tarka\n"
-                    "Accepted command line arguments:\n"
-                    '"-v" or "--version": Display version information\n'
-                    '"-d" or "--debug": Enter debugging mode')
+                "Expenses Tracker by Jason Tarka\n"
+                "Accepted command line arguments:\n"
+                '"-v" or "--version": Display version information\n'
+                '"-d" or "--debug": Enter debugging mode'
+                )
+                sys.exit()
+            if opt == "-v" or opt == "--version":
+                print(
+                "Application version: 1.1.0\n" f"Python version: {PYTHON_VERSION}"
+                )
                 sys.exit()
 
-            if "-v" in opts or "--version" in opts:
-                print(
-                    "Application version: 1.1.0\n"
-                    f"Python version: {PYTHON_VERSION}")
-                sys.exit()
-
-            if "-d" in opts or "--debug" in opts:
+            if opt == "-d" or opt == "--debug":
                 cmd_line_args["debug"] = True
 
         return cmd_line_args

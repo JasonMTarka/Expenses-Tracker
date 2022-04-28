@@ -1,14 +1,9 @@
-
 class Expense:
     """An Expense object to store values from a database record."""
 
     def __init__(
-            self,
-            primary_key,
-            date: str,
-            name: str,
-            cost: int,
-            tags: str) -> None:
+        self, primary_key, date: str, name: str, cost: int, tags: str
+    ) -> None:
         """Set attributes to Expense object."""
 
         self.key = primary_key
@@ -26,7 +21,8 @@ class Expense:
             f"{self.date},"
             f"{self.name},"
             f"{self.cost},"
-            f"{self.tags})")
+            f"{self.tags})"
+        )
 
     def __str__(self) -> str:
         """Return readable version of object attributes."""
@@ -36,4 +32,5 @@ class Expense:
             f"Date: {self.date}, "
             f"Name: {self.name}, "
             f"Cost: {self.cost}, "
-            f"Tags: {self.tags}")
+            f"Tags: {self.tags}"
+        )
