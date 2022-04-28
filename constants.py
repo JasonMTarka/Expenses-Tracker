@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Fields(Enum):
+class FieldNames(Enum):
     NAME = "name"
     COST = "cost"
     DATE = "date"
