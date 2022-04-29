@@ -1,7 +1,8 @@
 import tkinter as tk
+from typing import Dict
+
 from components.base.Component import Component
 from define.types import TagInfo
-from typing import Dict
 
 
 class Checkboxes(Component):
@@ -50,6 +51,7 @@ class Checkboxes(Component):
         return tags
 
     def get(self):
+        """Get all values from every checkbox and concatenate into a string."""
         final_tags = []
         for tag in self.tags:
             value = self.tags[tag]["value"].get()
@@ -58,5 +60,6 @@ class Checkboxes(Component):
         return ", ".join(final_tags)
 
     def reset(self):
+        """Reset each checkbox to unchecked."""
         for tag in self.tags:
             self.tags[tag]["value"].set(0)

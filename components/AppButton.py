@@ -1,4 +1,5 @@
 import tkinter as tk
+
 from components.base.HoverButton import HoverButton
 
 
@@ -15,3 +16,4 @@ class AppButton(tk.Frame):
             command=callback,
         )
         button.pack()
+        button.configure(activebackground="#d4d4ff")

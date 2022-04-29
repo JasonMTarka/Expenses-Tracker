@@ -7,7 +7,9 @@ class Component(tk.Frame):
         self.pack()
 
     def get(self) -> None:
+        """Get value from a component."""
         pass
 
     def reset(self) -> None:
+        """Reset component value back to initial setting."""
         pass

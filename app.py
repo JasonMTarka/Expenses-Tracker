@@ -17,6 +17,7 @@ class MainApplication:
         self.db = Database()
         self.frames = self.create_frames(root)
         AppButton(root, self.create_expense)
+        self.reset_cursor()
 
     def create_frames(self, root) -> dict[FieldNames, Component]:
         frames: Dict[FieldNames, Component] = {}
@@ -48,7 +49,7 @@ class MainApplication:
         try:
             self.db.add_expense(expense)
             self.clear_fields()
-            self.refocus_cursor()
+            self.reset_cursor()
 
         except:
             print("error")
@@ -59,7 +60,7 @@ class MainApplication:
         self.frames[FieldNames.DATE].reset()
         self.frames[FieldNames.TAGS].reset()
 
-    def refocus_cursor(self):
+    def reset_cursor(self):
         self.frames[FieldNames.NAME].field.focus_set()
 
 
