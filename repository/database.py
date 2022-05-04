@@ -14,7 +14,7 @@ class Database:
         if debug is True:
             self.conn = sqlite3.connect(":memory:")
         else:
-            self.conn = sqlite3.connect("repository/expenses.db")
+            self.conn = sqlite3.connect("expenses.db")
 
         self.c = self.conn.cursor()
 

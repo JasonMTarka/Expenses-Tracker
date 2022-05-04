@@ -4,9 +4,14 @@ from typing import List, Dict
 
 from repository.database import Database
 from entities.expense import Expense
-from components import InputField, AppButton, Checkboxes
+from components import InputField, AppButton, CheckboxGroup, RadioButtonGroup
 from components.base import Component
-from constants import FieldNames
+from constants import (
+    DOLLAR_TO_YEN,
+    TAG_NAMES,
+    ComponentNames,
+    Currencies,
+)
 from define.types import FieldInfo
 
 
@@ -15,34 +20,46 @@ class MainApplication:
 
     def __init__(self, root) -> None:
         self.db = Database()
-        self.frames = self.create_frames(root)
-        AppButton(root, self.create_expense)
+        self.components = self.create_components(root)
+        self.render_components()
         self.reset_cursor()
 
-    def create_frames(self, root) -> dict[FieldNames, Component]:
-        frames: Dict[FieldNames, Component] = {}
+    def create_components(self, root) -> dict[ComponentNames, Component]:
+        components: Dict[ComponentNames, Component] = {}
+
         input_fields: List[FieldInfo] = [
-            {"name": FieldNames.NAME, "label": "Expense Name: "},
-            {"name": FieldNames.COST, "label": "Expense Cost: "},
-            {"name": FieldNames.DATE, "label": "Expense Date: "},
+            {"name": ComponentNames.NAME, "label": "Expense Name: "},
+            {"name": ComponentNames.COST, "label": "Expense Cost: "},
+            {"name": ComponentNames.DATE, "label": "Expense Date: "},
         ]
         for field in input_fields:
             frame = InputField(root, field["label"])
-            frames[field["name"]] = frame
+            components[field["name"]] = frame
 
-        frames[FieldNames.TAGS] = Checkboxes(
-            root,
+        components[ComponentNames.CURRENCY] = RadioButtonGroup(
+            root, Currencies, Currencies.YEN, "Currency: "
         )
-        return frames
+
+        components[ComponentNames.TAGS] = CheckboxGroup(root, TAG_NAMES)
+
+        components[ComponentNames.CREATE] = AppButton(
+            root, self.create_expense
+        )
+
+        return components
 
     def create_expense(self):
-        name = self.frames[FieldNames.NAME].get()
-        cost = self.frames[FieldNames.COST].get()
-        date = self.frames[FieldNames.DATE].get()
-        tags = self.frames[FieldNames.TAGS].get()
+        name = self.components[ComponentNames.NAME].get()
+        cost = self.components[ComponentNames.COST].get()
+        date = self.components[ComponentNames.DATE].get()
+        tags = self.components[ComponentNames.TAGS].get()
+        currency = self.components[ComponentNames.CURRENCY].get()
 
         if not date:
             date = datetime.date.today()
+
+        if currency == Currencies.DOLLARS.value:
+            cost = str(round(float(cost) / DOLLAR_TO_YEN))
 
         expense = Expense(0, date=date, name=name, cost=cost, tags=tags)
 
@@ -55,13 +72,28 @@ class MainApplication:
             print("error")
 
     def clear_fields(self):
-        self.frames[FieldNames.NAME].reset()
-        self.frames[FieldNames.COST].reset()
-        self.frames[FieldNames.DATE].reset()
-        self.frames[FieldNames.TAGS].reset()
+        for field_name in ComponentNames:
+            self.components[field_name].reset()
 
     def reset_cursor(self):
-        self.frames[FieldNames.NAME].field.focus_set()
+        self.components[ComponentNames.NAME].field.focus_set()
+
+    def render_components(self):
+        component_order = [
+            ComponentNames.NAME,
+            ComponentNames.CURRENCY,
+            ComponentNames.COST,
+            ComponentNames.DATE,
+            ComponentNames.TAGS,
+            ComponentNames.CREATE,
+        ]
+        for i, component_name in enumerate(component_order):
+            component = self.components[component_name]
+
+            if i == (len(component_order) - 1):
+                component.pack(pady=(15))
+            else:
+                component.pack(pady=(2))
 
 
 def main() -> None:
