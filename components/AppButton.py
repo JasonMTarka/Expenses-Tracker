@@ -5,8 +5,8 @@ from components.base.Component import Component
 
 
 class AppButton(Component):
-    def __init__(self, root, callback, **kwargs) -> None:
-        tk.Frame.__init__(self, master=root, **kwargs)
+    def __init__(self, parent, callback, **kwargs) -> None:
+        tk.Frame.__init__(self, master=parent, **kwargs)
 
         button = HoverButton(
             self,

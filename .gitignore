@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 expenses.db
 *.sqbpro
+secrets.py

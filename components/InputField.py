@@ -4,8 +4,8 @@ from components.base.Component import Component
 
 
 class InputField(Component):
-    def __init__(self, root, label, **kwargs) -> None:
-        super().__init__(root, **kwargs)
+    def __init__(self, parent, label, **kwargs) -> None:
+        super().__init__(parent, **kwargs)
 
         self.label = tk.Label(
             self,

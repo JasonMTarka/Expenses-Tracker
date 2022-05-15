@@ -9,18 +9,18 @@ from constants import Currencies
 class RadioButtonGroup(Component):
     def __init__(
         self,
-        root,
+        parent,
         targets: Type[Currencies],
         default: Enum,
         label: str,
         **kwargs
     ) -> None:
-        super().__init__(root, **kwargs)
+        super().__init__(parent, **kwargs)
 
         self.default = default
         self.targets = targets
         self.label = label
-        self.group_value = tk.StringVar(root, default.value)
+        self.group_value = tk.StringVar(parent, default.value)
         self.create_buttons()
 
     def create_buttons(self):

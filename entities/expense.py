@@ -1,8 +1,10 @@
+import datetime
+
 class Expense:
     """An Expense object to store values from a database record."""
 
     def __init__(
-        self, primary_key, date: str, name: str, cost: int, tags: str
+        self, primary_key, name: str, cost: int, tags: str, date: datetime.datetime
     ) -> None:
         """Set attributes to Expense object."""
 
@@ -18,10 +20,10 @@ class Expense:
         return (
             "Expense("
             f"{self.key},"
-            f"{self.date},"
             f"{self.name},"
             f"{self.cost},"
-            f"{self.tags})"
+            f"{self.tags},"
+            f"{self.date})"
         )
 
     def __str__(self) -> str:
@@ -29,8 +31,8 @@ class Expense:
 
         return (
             f"ID: {self.key}, "
-            f"Date: {self.date}, "
             f"Name: {self.name}, "
             f"Cost: {self.cost}, "
-            f"Tags: {self.tags}"
+            f"Tags: {self.tags}, "
+            f"Date: {self.date}"
         )

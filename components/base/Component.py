@@ -1,11 +1,14 @@
 import tkinter as tk
+from typing import Any
+
+from components.base.Box import Box
 
 
 class Component(tk.Frame):
-    def __init__(self, root, **kwargs) -> None:
-        super().__init__(root, **kwargs)
+    def __init__(self, parent: Box, **kwargs) -> None:
+        super().__init__(parent, **kwargs)
 
-    def get(self) -> None:
+    def get(self) -> Any:
         """Get value from a component."""
         pass
 
