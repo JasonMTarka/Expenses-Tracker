@@ -2,6 +2,7 @@ import sqlite3
 from datetime import date
 
 from entities.expense import Expense
+from constants import Lookup
 
 
 class Repository:
@@ -20,10 +21,11 @@ class Repository:
         if setup is True or debug is True:
             self.setup()
 
-        (
-            self.lookup_name_from_id,
-            self.lookup_id_from_name,
-        ) = self._create_lookup_tables()
+        name_from_id, id_from_name = self._create_lookup_tables()
+        self.lookup = {
+            Lookup.ID_FROM_NAME: id_from_name,
+            Lookup.NAME_FROM_ID: name_from_id,
+        }
 
     def setup(self) -> None:
         """Handle first-time setup or debugging mode setup."""
@@ -188,7 +190,7 @@ class Repository:
         tag_ids = [tag[0] for tag in self.c.fetchall()]
         tag_names = []
         for id in tag_ids:
-            tag_names.append(self.lookup_name_from_id[id])
+            tag_names.append(self.lookup[Lookup.NAME_FROM_ID][id])
         return tag_names
 
     def get_over(self, upper: int, limit: int = 100) -> list[Expense]:
@@ -249,7 +251,7 @@ class Repository:
 
         tags = expense.tags.split(", ")
         for tag in tags:
-            tag_id = self.lookup_id_from_name[tag]
+            tag_id = self.lookup[Lookup.ID_FROM_NAME][tag]
             self.c.execute(
                 "INSERT INTO expense_tags VALUES (:expense_id, :tag_id)",
                 {"expense_id": expense_id, "tag_id": tag_id},
