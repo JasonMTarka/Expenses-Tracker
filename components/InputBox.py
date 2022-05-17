@@ -8,6 +8,7 @@ from constants import (
     DOLLAR_TO_YEN,
     ComponentNames,
     Currencies,
+    Lookup,
 )
 from define.types import FieldInfo
 
@@ -37,7 +38,7 @@ class InputBox(Box):
         components[ComponentNames.CURRENCY] = RadioButtonGroup(
             self, Currencies, Currencies.YEN, "Currency: "
         )
-        tags = self.db.lookup_id_from_name.keys()
+        tags = self.db.lookup[Lookup.ID_FROM_NAME].keys()
         components[ComponentNames.TAGS] = CheckboxGroup(self, tags)
 
         components[ComponentNames.CREATE] = AppButton(self, self.create_expense)
